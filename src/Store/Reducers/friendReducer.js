@@ -40,7 +40,7 @@ const friendReducer = (state = initialState, action) => {
             }
         case "NEW_MESSAGE":
             const friends = state.friends
-            const index = friends.findIndex(el=> el.ID === action.payload.sender || el.ID === action.payload.recipientID)
+            let index = friends.findIndex(el=> el.ID === action.payload.sender || el.ID === action.payload.recipientID)
             if (index !== -1){
                 if (action.payload.messageType === "info"){
                         switch (action.payload.updateType) {
@@ -95,6 +95,32 @@ const friendReducer = (state = initialState, action) => {
                 }
             }
             break
+        case "UPDATE_FRIEND":
+            const friendIndex = state.friends.findIndex(el=> el.ID === action.payload.friendID)
+            const friendArray = state.friends 
+            console.log(action.payload.type);
+            switch (action.payload.type) {
+                case "archive":
+                    friendArray[friendIndex].archived = action.payload.state
+                    return{
+                        ...state,
+                        friends: friendArray
+                    }
+                case "favorite":
+                    friendArray[friendIndex].favorite = action.payload.state
+                    return{
+                        ...state,
+                        friends: friendArray
+                    }
+                case "block":
+                    friendArray[friendIndex].blocked = action.payload.state
+                    return{
+                        ...state,
+                        friends: friendArray
+                    }
+                default:
+                    return state
+            }
         default:
             return state
     }

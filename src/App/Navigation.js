@@ -12,7 +12,7 @@ import {useNavigate} from "react-router-dom"
 import * as FeatherIcon from 'react-feather'
 import {sidebarAction} from '../Store/Actions/sidebarAction'
 import EditProfileModal from './Modals/EditProfileModal'
-import {profileAction} from "../Store/Actions/profileAction"
+import {profileAction, selectedProfile} from "../Store/Actions/profileAction"
 import SettingsModal from "./Modals/SettingsModal"
 import {mobileSidebarAction} from "../Store/Actions/mobileSidebarAction"
 import Avatar from "../utils/Avatar"
@@ -73,6 +73,10 @@ function Navigation(props) {
     const profileActions = () => {
         dispatch(profileAction(true));
         dispatch(mobileProfileAction(true))
+        dispatch(selectedProfile({
+            ...props.profile,
+            ID: props.ID
+        }))
     };
 
     const navigationItems = [
@@ -198,7 +202,9 @@ function Navigation(props) {
 
 const mapStateToProps = (state) => {
     return {
-      avatar : state?.auth?.profile?.avatar
+      avatar : state?.auth?.profile?.avatar,
+      profile: state.auth?.profile,
+      ID: state.auth?.userID
     }
   }
   

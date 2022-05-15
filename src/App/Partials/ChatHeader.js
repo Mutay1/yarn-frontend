@@ -4,12 +4,14 @@ import {
     Dropdown, DropdownToggle, DropdownMenu, DropdownItem
 } from 'reactstrap'
 import * as FeatherIcon from 'react-feather'
+import {connect} from "react-redux"
 import VoiceCallModal from "../Modals/VoiceCallModal"
 import VideoCallModal from "../Modals/VideoCallModal"
-import {profileAction} from "../../Store/Actions/profileAction"
+import {profileAction, selectedProfile} from "../../Store/Actions/profileAction"
 import {closeSelectedChat} from "../../Store/Actions/selectedChatAction"
 import {mobileProfileAction} from "../../Store/Actions/mobileProfileAction";
 import Avatar from "../../utils/Avatar"
+import {getFriends, UpdateFriend} from "../../Store/Actions/friendAction"
 
 function ChatHeader(props) {
 
@@ -27,6 +29,7 @@ function ChatHeader(props) {
     const profileActions = () => {
         dispatch(profileAction(true));
         dispatch(mobileProfileAction(true))
+        dispatch(selectedProfile(props.selectedChat))
     };
 
     return (
@@ -66,10 +69,18 @@ function ChatHeader(props) {
                             </DropdownToggle>
                             <DropdownMenu right>
                                 <DropdownItem onClick={profileActions}>Profile</DropdownItem>
-                                <DropdownItem>Add to archive</DropdownItem>
+                               {props.selectedChat.archived ? 
+                                <DropdownItem onClick={() => props.updateFriend(false, props.selectedChat.ID, "archive")}>Unarchive</DropdownItem>
+                                : <DropdownItem onClick={() => props.updateFriend(true, props.selectedChat.ID, "archive")}>Archive</DropdownItem>}
+                                {props.selectedChat.favorite ? 
+                                <DropdownItem onClick={() => props.updateFriend(false, props.selectedChat.ID, "favorite")}>Remove from favorites</DropdownItem>
+                                : <DropdownItem onClick={() => props.updateFriend(true, props.selectedChat.ID, "favorite")}>Add to favorites</DropdownItem>}
                                 <DropdownItem>Delete</DropdownItem>
+
                                 <DropdownItem divider/>
-                                <DropdownItem>Block</DropdownItem>
+                                {props.selectedChat.blocked ? 
+                                <DropdownItem onClick={() => props.updateFriend(false, props.selectedChat.ID, "block")}>Unblock</DropdownItem>
+                                : <DropdownItem onClick={() => props.updateFriend(true, props.selectedChat.ID, "block")}>Block</DropdownItem>}
                             </DropdownMenu>
                         </Dropdown>
                     </li>
@@ -79,4 +90,13 @@ function ChatHeader(props) {
     )
 }
 
-export default ChatHeader
+
+  const mapDispatchToProps = dispatch => {
+    return {
+      getFriends: () => dispatch(getFriends()),
+      updateFriend: (state, ID, type) => dispatch(UpdateFriend(state, ID, type))
+    }
+  }
+  
+  
+export default connect(null, mapDispatchToProps)(ChatHeader)

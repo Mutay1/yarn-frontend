@@ -2190,3 +2190,110 @@ body.rtl {
       padding-left: 20px;
       width: 100% !important;
       margin-bottom: 20px; } }
+
+      .emojis-main .emojis-contain,
+      .emojis-main .sticker-contain {
+          width: 0;
+          height: 0;
+          background-color: #fff;
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          -webkit-transform: scale(0);
+          transform: scale(0);
+          -webkit-transition: all 0.3s ease;
+          transition: all 0.3s ease
+      }
+      
+      .emojis-main .emojis-contain.open,
+      .emojis-main .sticker-contain.open {
+          bottom: 85px;
+          -webkit-transform: scale(1);
+          transform: scale(1);
+          -webkit-transition: all 0.3s ease;
+          transition: all 0.3s ease;
+          width: 420px;
+          height: 280px
+      }
+      
+      .emojis-main .emojis-contain .emojis-sub-contain,
+      .emojis-main .sticker-contain .emojis-sub-contain {
+          height: 100%;
+          overflow: overlay
+      }
+      
+      .emojis-main .emojis-contain .emojis-sub-contain:before,
+      .emojis-main .sticker-contain .emojis-sub-contain:before {
+          content: "";
+          position: absolute;
+          width: 0;
+          height: 0;
+          border-left: 12px solid transparent;
+          border-right: 12px solid transparent;
+          border-top: 12px solid #fff;
+          bottom: -12px;
+          left: 70px;
+          z-index: 1
+      }
+      
+.emojis-main .emojis-contain .emojis-sub-contain ul li,
+.emojis-main .sticker-contain .emojis-sub-contain ul li {
+    display: inline-block;
+    font-size: 24px;
+    padding: 5px;
+    cursor: pointer
+}
+
+.emojis-main .emojis-contain .sticker-sub-contain,
+.emojis-main .sticker-contain .sticker-sub-contain {
+    height: 100%;
+    overflow: overlay
+}
+
+.emojis-main .emojis-contain .sticker-sub-contain ul li,
+.emojis-main .sticker-contain .sticker-sub-contain ul li {
+    display: inline-block
+}
+
+.emojis-main .emojis-contain .sticker-sub-contain ul li img,
+.emojis-main .sticker-contain .sticker-sub-contain ul li img {
+    width: 45px;
+    height: auto
+}      
+
+.emojis-main {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex
+}
+      
+.emojis-main .emojis-contain .emojis-sub-contain:before,
+.emojis-main .sticker-contain .emojis-sub-contain:before {
+    left: 40px
+}
+
+.emojis-main .emojis-contain.open,
+.emojis-main .sticker-contain.open {
+    bottom: 60px;
+    width: 280px;
+    height: 280px
+}
+
+.custom-scroll {
+  scroll-behavior: smooth
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px #eff1f2;
+  box-shadow: inset 0 0 6px #eff1f2
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 5px
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(28, 157, 234, 0.15)
+}

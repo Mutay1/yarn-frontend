@@ -101,6 +101,10 @@ function Chat(props) {
         setInputMsg(newValue);
     };
 
+    const emojiClick = (e) =>{
+        setInputMsg(inputMsg + e.target.innerHTML)
+    }
+
     useEffect(() => {
         if (scrollEl) {
             setTimeout(() => {
@@ -162,7 +166,7 @@ function Chat(props) {
                                 </div>
                             </div>
                         </PerfectScrollbar>
-                        <ChatFooter handleSubmit={handleSubmit} handleChange={handleChange} inputMsg={inputMsg}/>
+                        <ChatFooter handleSubmit={handleSubmit} handleChange={handleChange} inputMsg={inputMsg} click={emojiClick}/>
                     </React.Fragment>
                     :
                     <Empty message="Select a chat to read messages" showImg/>

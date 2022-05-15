@@ -90,7 +90,7 @@ function Index(props) {
         </li>
     };
     let friends = !props.friends ? [] : props.friends
-    friends = friends.filter(chat => chat.messages && chat.messages !== []).sort((a,b) =>{
+    friends = friends.filter(chat => chat.messages && !chat.archived).sort((a,b) =>{
         const date1 = new Date(a.messages[a.messages.length - 1].createdAt)
         const date2 = new Date(b.messages[b.messages.length - 1].createdAt)
         return date2 - date1
@@ -133,7 +133,7 @@ function Index(props) {
                 {chatList.length > 0 ? <ul className="list-group list-group-flush">
                         {chatList}
                     </ul> : <Empty message={
-                        <span>No chat found. Click <FeatherIcon.PlusCircle/> to start a chat</span>
+                        <span>No active chat found. Click <FeatherIcon.PlusCircle/> to start a chat</span>
                     }/>}
                 </PerfectScrollbar>
             </div>

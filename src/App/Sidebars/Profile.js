@@ -29,7 +29,7 @@ function Profile(props) {
     return (
         <>
             {props.profile ?<div className={`sidebar-group ${mobileProfileSidebar ? "mobile-open" : ""}`}>
-                <div className={profileSidebar ? 'sidebar active' : 'sidebar'}>
+                <div className={profileSidebar.open ? 'sidebar active' : 'sidebar'}>
                     <header>
                         <div className="d-flex align-items-center">
                             <span className="sidebar-title">Profile</span>
@@ -76,7 +76,7 @@ function Profile(props) {
                                             <p className="text-muted">{props.profile.city}</p>
                                         </div>
                                         <div className="mt-4 mb-4">
-                                            <h6 className="mb-3">Settings</h6>
+                                            {props.ID !== props.profile.ID ? <><h6 className="mb-3">Settings</h6>
                                             <div className="form-group">
                                                 <div className="form-item custom-control custom-switch">
                                                     <input type="checkbox" className="custom-control-input"
@@ -84,7 +84,7 @@ function Profile(props) {
                                                     <label className="custom-control-label"
                                                         htmlFor="customSwitch11">Block</label>
                                                 </div>
-                                            </div>
+                                            </div></> : null}
                                         </div>
                                     </TabPane>
                                 </TabContent>
@@ -99,7 +99,8 @@ function Profile(props) {
 
 const mapStateToProps = (state) => {
     return {
-      profile: state.profileSidebar.selectedProfile
+      profile: state.profileSidebar.selectedProfile,
+      ID: state.auth?.userID
     }
   }
   

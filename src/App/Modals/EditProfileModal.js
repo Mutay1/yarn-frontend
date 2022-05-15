@@ -5,6 +5,7 @@ import {
     TabContent,
     TabPane,
     Nav,
+    Alert,
     NavItem,
     NavLink,
     ModalFooter,
@@ -22,12 +23,17 @@ import axios from "axios"
 import classnames from 'classnames'
 import {getProfile} from "../../Store/Actions/authAction"
 import Avatar from "../../utils/Avatar"
+import Loader from "../../utils/Loader"
+import Error from "../../utils/Error"
 
 function EditProfileModal(props) {
     const [activeTab, setActiveTab] = useState('1');
     const [status, setStatus] = useState(props.profile.status);
     const [about, setAbout] = useState(props.profile.about);
     const [city, setCity] = useState(props.profile.city);
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
+    const [success, setSuccess] = useState(false)
     const [selectedFile, setSelectedFile] = React.useState(null);
 
     const toggle = tab => {
@@ -36,22 +42,28 @@ function EditProfileModal(props) {
 
     const submitForm = async(event) =>{
         event.preventDefault()
+        setSuccess(false)
+        setLoading(true)
         const formData = new FormData();
         formData.append("selectedFile", selectedFile);
         formData.append("status", status);
         formData.append("about", about);
         formData.append("city", city);
         try {
-          const response = await axios({
-            method: "post",
-            url: "http://192.168.43.236:8000/users/profile",
-            data: formData,
-            headers: { "Content-Type": "multipart/form-data", Authorization: props.token},
-          });
-          console.log(response);
-          props.getProfile()
+            await axios({
+                method: "post",
+                url: "http://192.168.43.236:8000/users/profile",
+                data: formData,
+                headers: { "Content-Type": "multipart/form-data", Authorization: props.token},
+            });
+            props.getProfile()
+            setSuccess(true)
+            setError(null)
+            setLoading(false)
         } catch(error) {
-          console.log(error)
+            setError(error)
+            setSuccess(null)
+            setLoading(false)
         }
       }
 
@@ -62,6 +74,8 @@ function EditProfileModal(props) {
                     <FeatherIcon.Edit2 className="mr-2"/> Edit Profile
                 </ModalHeader>
                 <ModalBody>
+                {success ? <Alert color="success">Profile successfully updated.</Alert> : null}
+                    <Error error={error}/>
                     <Nav tabs>
                         <NavItem>
                             <NavLink
@@ -84,7 +98,7 @@ function EditProfileModal(props) {
                             </NavLink>
                         </NavItem>
                     </Nav>
-                    <Form>
+                    <Form onSubmit={(e) => submitForm(e)}>
                         <TabContent activeTab={activeTab}>
                             <TabPane tabId="1">
                                 <FormGroup>
@@ -125,7 +139,7 @@ function EditProfileModal(props) {
                     </Form>
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="primary" onClick={(e) => submitForm(e)}>Save</Button>
+                <Button color="primary" onClick={(e) => submitForm(e)}>{loading ? <Loader/> : "Submit"}</Button>
                 </ModalFooter>
             </Modal>
         </div>

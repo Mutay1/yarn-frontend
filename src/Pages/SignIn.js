@@ -5,11 +5,14 @@ import {connect} from "react-redux"
 import * as actions from "../Store/Actions/authAction"
 import Loader from "../utils/Loader"
 import Error from "../utils/Error"
+import * as FeatherIcons from "react-feather"
+import {FormGroup, InputGroup, Input, InputGroupText} from "reactstrap"
 
 function SignIn(props) {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => document.body.classList.add('form-membership'), []);
@@ -42,16 +45,20 @@ function SignIn(props) {
                         onChange={(e) => setEmail(e.target.value.toLowerCase())}
                     />
                 </div>
-                <div className="form-group">
-                    <input 
-                        type="password" 
-                        name="password"
-                        value={password} 
-                        className="form-control" 
-                        placeholder="Password"
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
+                <FormGroup>
+                    <InputGroup>
+                        <Input 
+                            type={showPassword ? "text" : "password" }
+                            name="password"
+                            value={password} 
+                            placeholder="Password"
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <InputGroupText style={{height:"fit-content"}} onClick={()=>setShowPassword(!showPassword)}>
+                            {showPassword ? <FeatherIcons.EyeOff/> : <FeatherIcons.Eye/>}
+                        </InputGroupText>
+                    </InputGroup>
+                </FormGroup>
                 <div className="form-group d-flex justify-content-between">
                     <div className="custom-control custom-checkbox">
                         <input type="checkbox" className="custom-control-input" checked="" id="customCheck1"/>

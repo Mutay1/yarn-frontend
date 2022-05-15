@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 import * as FeatherIcon from 'react-feather'
 import 'react-perfect-scrollbar/dist/css/styles.css'
-import {connect} from "react-redux"
+import {connect, useDispatch} from "react-redux"
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import AddFriendsModal from "../../Modals/AddFriendModal"
 import FriendsDropdown from "./FriendsDropdown"
@@ -10,6 +10,7 @@ import Error from "../../../utils/Error"
 import Avatar from "../../../utils/Avatar"
 import Empty from "../../../utils/Empty"
 import * as actions from "../../../Store/Actions/friendAction"
+import {selectedChatAction} from "../../../Store/Actions/selectedChatAction"
 
 
 function Index(props) {
@@ -19,9 +20,14 @@ function Index(props) {
         }
     },[props.friends])
 
-    
+    const dispatch = useDispatch()
 
     const mobileMenuBtn = () => document.body.classList.toggle('navigation-open');
+
+    const chatSelectHandle = (chat) => {
+        dispatch(selectedChatAction(chat));
+        document.querySelector('.chat').classList.add('open');
+    };
 
     return (
         <div className="sidebar active">
@@ -48,17 +54,12 @@ function Index(props) {
                             <ul className="list-group list-group-flush">
                                 {props.friends && props.friends?.length > 0 ?
                                     props.friends.map((item, i) => {
-                                        return <li key={i} className="list-group-item">
+                                        return <li key={i} onClick={() => chatSelectHandle(item)} className="list-group-item">
                                             <Avatar source={item.avatarURL}/>
                                             <div className="users-list-body">
                                                 <div>
                                                 <h5>{item.firstName + " " + item.lastName}</h5>
                                                 <p>{item.status}</p>
-                                                </div>
-                                                <div className="users-list-action">
-                                                    <div className="action-toggle">
-                                                        <FriendsDropdown profile={item}/>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </li>

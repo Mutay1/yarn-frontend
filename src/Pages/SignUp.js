@@ -1,16 +1,32 @@
 import React, {useEffect, useState} from "react"
 import Logo from "../Icons/logo"
-import Axios from "../utils/Axios"
+import * as FeatherIcons from "react-feather"
 import axios from "axios"
 import Error from "../utils/Error"
 import {Link, useNavigate} from "react-router-dom"
 import {connect} from "react-redux"
 import Loader from "../utils/Loader"
 import {authSuccess, checkAuthTimeout, storeAuth} from "../Store/Actions/authAction"
+import {FormGroup, InputGroup, InputGroupText, FormFeedback} from "reactstrap"
+import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+
+const schema = yup.object({
+  firstName: yup.string().required().min(2, "Enter a valid name"),
+  firstName: yup.string().required().min(2, "Enter a valid name"),
+  username: yup.string().required().min(3, "Enter a username with minimum of 3 characters"),
+  email: yup.string().email("Enter a valid email").required(),
+  password: yup.string().min(8, "Enter a password with a minimum of 8 characters "),
+  confirmPassword: yup.string().equals([yup.ref("password")], "Passwords do not match")
+}).required();
 
 function SignUp(props) {
 
     const navigate = useNavigate()
+    const {register, handleSubmit, formState: {errors}} = useForm({
+        resolver: yupResolver(schema)
+    })
 
     useEffect(() => {
         document.body.classList.add('form-membership')
@@ -19,27 +35,22 @@ function SignUp(props) {
         }
     }, []);
     
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [firstName, setFirstName] = useState("")
-    const [lastName, setLastName] = useState("")
-    const [username, setUsername] = useState("")
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-    const [confirmPassword, setConfirmPassword] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
 
-    const submitForm = async () =>{
+    const submitForm = async (data) =>{
         setLoading(true)
         setError(null)
-        const payload = {
-            firstName: firstName,
-            lastName: lastName,
-            password: password,
-            username: username.toLowerCase().trim(),
-            email: email.toLowerCase().trim()
-        }
+        // const payload = {
+        //     firstName: firstName,
+        //     lastName: lastName,
+        //     password: password,
+        //     username: username.toLowerCase().trim(),
+        //     email: email.toLowerCase().trim()
+        // }
         try {
-            const response = await axios.post("http://192.168.43.236:8000/users/signup", payload)
+            const response = await axios.post("http://192.168.43.236:8000/users/signup", {...data})
             props.authSuccess(response.data.token, response.data.userID, response.data.refreshToken, response.data.profile, response.data.expirationTime)
             storeAuth(
                 response.data.token, 
@@ -57,6 +68,7 @@ function SignUp(props) {
         }
     }
 
+    console.log(errors);
     
     return (
         <div className="form-wrapper">
@@ -66,72 +78,100 @@ function SignUp(props) {
             <h5>Create account</h5>
             <Error error={error}/>
             <form
-                onSubmit={(e)=>{
-                    e.preventDefault()
-                    submitForm()
-                }}
+                onSubmit={handleSubmit(submitForm)}
             >
                 <div className="form-group">
+                {console.log(errors)}
                     <input 
                         type="text" 
-                        className="form-control" 
-                        placeholder="Firstname" 
+                        className={`form-control ${errors.firstName ? "is-invalid" : ""}`} 
+                        placeholder="Firstname"
+                        {...register("firstName")}
+                        name="firstName" 
                         required 
                         autoFocus
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        // value={firstName}
+                        // onChange={(e) => setFirstName(e.target.value)}
                     />
+                    <FormFeedback>
+                            {errors.firstName?.message}
+                    </FormFeedback>
                 </div>
                 <div className="form-group">
                     <input 
                         type="text" 
-                        className="form-control" 
-                        placeholder="Lastname" 
+                        className={`form-control ${errors.lastName ? "is-invalid" : ""}`}
+                        placeholder="Lastname"
+                        name="lastName"
+                        {...register("lastName")} 
                         required
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        // value={lastName}
+                        // onChange={(e) => setLastName(e.target.value)}
                     />
+                    <FormFeedback>
+                            {errors.lastName?.message}
+                    </FormFeedback>
                 </div>
 
                 <div className="form-group">
                     <input 
                         type="email" 
-                        className="form-control" 
-                        placeholder="Email" 
+                        className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                        placeholder="Email"
+                        name="email"
                         required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        {...register("email")} 
+                        // value={email}
+                        // onChange={(e) => setEmail(e.target.value)}
                     />
+                    <FormFeedback>
+                            {errors.email?.message}
+                    </FormFeedback>
                 </div>
-                <div className="form-group">
-                    <input 
-                        type="password" 
-                        className="form-control" 
-                        placeholder="Password" 
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
-                <div className="form-group">
-                    <input 
-                        type="password" 
-                        className="form-control" 
-                        placeholder="Confirm password" 
-                        required
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                </div>
+                <FormGroup>
+                    <InputGroup>
+                        <input 
+                            type={showPassword ? "text" : "password" }
+                            name="password"
+                            className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                            placeholder="Password"
+                            {...register("password")} 
+                            
+                        />
+                        <InputGroupText style={{height:"fit-content"}} onClick={()=>setShowPassword(!showPassword)}>
+                            {showPassword ? <FeatherIcons.EyeOff/> : <FeatherIcons.Eye/>}
+                        </InputGroupText>
+                        <FormFeedback>
+                            {errors.password?.message}
+                        </FormFeedback>
+                    </InputGroup>
+                </FormGroup>
+                <FormGroup>
+                    <InputGroup>
+                        <input 
+                            type={showPassword ? "text" : "password" }
+                            name="confirmPassword"
+                            className={`form-control ${errors.confirmPassword ? "is-invalid" : ""}`}
+                            {...register("confirmPassword")} 
+                            placeholder="Confirm Password"
+                        />
+                        <FormFeedback>
+                            {errors.confirmPassword?.message}
+                        </FormFeedback>
+                    </InputGroup>
+                </FormGroup>
                 <div className="form-group">
                     <input 
                         type="text" 
-                        className="form-control" 
+                        className={`form-control ${errors.username ? "is-invalid" : ""}`}
+                        name="username"
                         placeholder="Username" 
                         required
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        {...register("username")} 
                     />
+                    <FormFeedback>
+                            {errors.username?.message}
+                        </FormFeedback>
                 </div>
                 <button className="btn btn-primary btn-block">{loading ? <Loader/> : "Register"}</button>
                 <hr/>

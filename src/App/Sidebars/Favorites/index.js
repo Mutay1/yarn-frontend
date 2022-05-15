@@ -2,12 +2,51 @@ import React from 'react'
 import 'react-perfect-scrollbar/dist/css/styles.css'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import FavoritesDropdown from "./FavoritesDropdown"
-import {favoriteChats} from "./Data"
+import {useDispatch} from "react-redux"
 import * as FeatherIcon from "react-feather"
+import {connect} from "react-redux"
+import Avatar from "../../../utils/Avatar"
+import Empty from "../../../utils/Empty"
+import {selectedChatAction} from "../../../Store/Actions/selectedChatAction";
 
-function Index() {
+function Index(props) {
+    const dispatch = useDispatch()
+
+    const chatSelectHandle = (chat) => {
+        dispatch(selectedChatAction(chat));
+        document.querySelector('.chat').classList.add('open');
+    };
 
     const mobileMenuBtn = () => document.body.classList.toggle('navigation-open');
+    const formatTime = (date) =>{
+        return new Date(date).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+    }
+
+    const ChatListView = ({chat}) => {
+        return <li className={"list-group-item" } onClick={() => chatSelectHandle(chat)}>
+                <Avatar source={chat.avatarURL}/>
+            <div className="users-list-body">
+                <div>
+                    <h5 className={chat.unreadMessages ? 'text-primary' : ''}>{chat.firstName + " " + chat.lastName}</h5>
+                    {chat.messages[chat.messages.length-1].content}
+                </div>
+                <div className="users-list-action">
+                    {chat.unreadMessages ? <div className="new-message-count">{chat.unreadMessages}</div> : ''}
+                    <small className={chat.unreadMessages ? 'text-primary' : 'text-muted'}>{formatTime(chat.messages[chat.messages.length - 1].createdAt)}</small>
+                    <div className="action-toggle">
+                        <FavoritesDropdown chat={chat}/>
+                    </div>
+                </div>
+            </div>
+        </li>
+    };
+    let friends = !props.friends ? [] : props.friends
+    friends = friends.filter(chat => chat.messages && chat.favorite).sort((a,b) =>{
+        const date1 = new Date(a.messages[a.messages.length - 1].createdAt)
+        const date2 = new Date(b.messages[b.messages.length - 1].createdAt)
+        return date2 - date1
+    })
+    const chatList = friends.map((chat, i) => <ChatListView chat={chat} key={i}/>)
 
     return (
         <div className="sidebar active">
@@ -20,33 +59,25 @@ function Index() {
                 </div>
             </header>
             <form>
-                <input type="text" className="form-control" placeholder="Search favorites"/>
+                <input type="text" className="form-control" placeholder="Search chats"/>
             </form>
             <div className="sidebar-body">
                 <PerfectScrollbar>
-                    <ul className="list-group list-group-flush">
-                        {
-                            favoriteChats.map((item, i) => {
-                                return <li key={i} className="list-group-item">
-                                    <div className="users-list-body">
-                                        <div>
-                                            <h5>{item.name}</h5>
-                                            {item.text}
-                                        </div>
-                                        <div className="users-list-action">
-                                            <div className="action-toggle">
-                                                <FavoritesDropdown/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            })
-                        }
-                    </ul>
+                {chatList.length > 0 ? <ul className="list-group list-group-flush">
+                        {chatList}
+                    </ul> : <Empty message={
+                        <span>No chat found in favorites.</span>
+                    }/>}
                 </PerfectScrollbar>
             </div>
         </div>
     )
 }
 
-export default Index
+const mapStateToProps = (state) => {
+    return {
+      friends : state.friends.friends
+    }
+  }
+  
+export default connect(mapStateToProps)(Index)

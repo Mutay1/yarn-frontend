@@ -1,4 +1,4 @@
-
+import Axios from "../../utils/Axios"
 export const getFriends = () =>{
     return async dispatch => {
         try {
@@ -36,4 +36,27 @@ export const updateMessages = (conn, sender, recipient, type) => {
         dispatch({type:"DELIVERY_REPORT_SENT"})
     }
 
+}
+
+export const UpdateFriend = (state, friendID, type) => {
+    return async dispatch => {
+        const payload = {
+            state,
+            friendID
+        }
+        console.log("UPDATING");
+        try {
+            await Axios.post(`/friends/${type}`, payload)
+            dispatch({
+                type: "UPDATE_FRIEND",
+                payload:{
+                    type,
+                    state,
+                    friendID
+                }
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
